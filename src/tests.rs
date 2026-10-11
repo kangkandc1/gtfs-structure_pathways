@@ -632,9 +632,13 @@ fn read_levels() {
     // Verify full integration via Gtfs
     let gtfs = Gtfs::from_path("fixtures/with_levels").expect("impossible to read gtfs");
     assert_eq!(gtfs.levels.len(), 4);
-    let street = gtfs.get_level("level_street").expect("level_street should exist");
+    let street = gtfs
+        .get_level("level_street")
+        .expect("level_street should exist");
     assert_eq!(street.level_index, 0.0);
     assert_eq!(street.level_name.as_deref(), Some("Street Level"));
-    let platform = gtfs.get_level("level_platform").expect("level_platform should exist");
+    let platform = gtfs
+        .get_level("level_platform")
+        .expect("level_platform should exist");
     assert_eq!(platform.level_index, -1.0);
 }
