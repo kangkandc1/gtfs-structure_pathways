@@ -497,6 +497,53 @@ impl<'de> Deserialize<'de> for TimepointType {
     }
 }
 
+/// Defines how a stop is accessed from the street network. See <https://gtfs.org/reference/static/#stopstxt> `stop_access`
+#[derive(Debug, Default, PartialEq, Eq, Hash, Clone, Copy)]
+pub enum StopAccess {
+    /// The stop/platform cannot be directly accessed from the street network
+    #[default]
+    NotDirectlyAccessible,
+    /// Directions should be generated for access directly to the stop
+    DirectlyAccessible,
+    /// An unknown value not in the specification
+    Unknown(i16),
+}
+
+impl<'de> Deserialize<'de> for StopAccess {
+    fn deserialize<D>(deserializer: D) -> Result<StopAccess, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = <&str>::deserialize(deserializer)?;
+        Ok(match s {
+            "" => StopAccess::NotDirectlyAccessible,
+            "0" => StopAccess::NotDirectlyAccessible,
+            "1" => StopAccess::DirectlyAccessible,
+            s => StopAccess::Unknown(s.parse().map_err(|_| {
+                serde::de::Error::custom(format!(
+                    "invalid value for StopAccess, must be an integer: {s}"
+                ))
+            })?),
+        })
+    }
+}
+
+impl Serialize for StopAccess {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serialize_i16_as_str(
+            serializer,
+            match self {
+                StopAccess::NotDirectlyAccessible => 0,
+                StopAccess::DirectlyAccessible => 1,
+                StopAccess::Unknown(i) => *i,
+            },
+        )
+    }
+}
+
 /// Generic enum to define if a service (like wheelchair boarding) is available
 #[derive(Debug, Default, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum Availability {

@@ -197,6 +197,9 @@ pub struct Stop {
     /// Text to speech readable version of the stop_name
     #[serde(rename = "tts_stop_name")]
     pub tts_name: Option<String>,
+    /// Indicates how the stop is accessed for a particular station
+    #[serde(deserialize_with = "de_with_empty_default", default)]
+    pub stop_access: StopAccess,
 }
 
 impl Type for Stop {

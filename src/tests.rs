@@ -652,4 +652,11 @@ fn supply_pathways() {
     assert_eq!(pathways.get("pw_broken_mode").unwrap().id,"pw_broken_mode");
 
 }
-
+#[test]
+fn read_stop_access(){
+    let gtfs = Gtfs::from_path("fixtures/with_levels").expect("impossible to read gtfs");
+    let stops = gtfs.stops;
+    let example_stop = stops.get("station_A_entrance_1");
+    assert!(example_stop.is_some());
+    assert_eq!(example_stop.unwrap().stop_access,StopAccess::NotDirectlyAccessible)
+}

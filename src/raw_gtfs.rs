@@ -151,6 +151,9 @@ impl RawGtfs {
                 if let Availability::Unknown(_) = stop.wheelchair_boarding {
                     stop.wheelchair_boarding = Availability::default();
                 }
+                if let StopAccess::Unknown(_) = stop.stop_access {
+                    stop.stop_access = StopAccess::default();
+                }
             }
         }
         if let Ok(stop_times) = &mut self.stop_times {
