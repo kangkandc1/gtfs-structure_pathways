@@ -51,6 +51,8 @@ pub struct Gtfs {
     pub feed_info: Vec<FeedInfo>,
     /// All levels by `level_id`
     pub levels: HashMap<String, Level>,
+    /// All pathways by pathway id
+    pub pathways: HashMap<String, Pathway>,
 }
 
 impl TryFrom<RawGtfs> for Gtfs {
@@ -61,10 +63,11 @@ impl TryFrom<RawGtfs> for Gtfs {
     fn try_from(raw: RawGtfs) -> Result<Gtfs, Error> {
         let start = Instant::now();
 
+        let raw_pathways = raw.pathways.unwrap_or_else(|| Ok(Vec::new()))?;
         let stops = to_stop_map(
             raw.stops?,
             raw.transfers.unwrap_or_else(|| Ok(Vec::new()))?,
-            raw.pathways.unwrap_or(Ok(Vec::new()))?,
+            raw_pathways.clone(),
         )?;
         let frequencies = raw.frequencies.unwrap_or_else(|| Ok(Vec::new()))?;
         let trips = create_trips(raw.trips?, raw.stop_times?, frequencies, &stops)?;
@@ -92,6 +95,7 @@ impl TryFrom<RawGtfs> for Gtfs {
             rider_categories: to_map(raw.rider_categories.unwrap_or_else(|| Ok(Vec::new()))?),
             feed_info: raw.feed_info.unwrap_or_else(|| Ok(Vec::new()))?,
             levels: to_map(raw.levels.unwrap_or_else(|| Ok(Vec::new()))?),
+            pathways: raw_pathways.into_iter().map(|rp| (rp.id.clone(), Pathway::from(rp))).collect(),
             calendar: to_map(raw.calendar.unwrap_or_else(|| Ok(Vec::new()))?),
             calendar_dates: to_calendar_dates(
                 raw.calendar_dates.unwrap_or_else(|| Ok(Vec::new()))?,

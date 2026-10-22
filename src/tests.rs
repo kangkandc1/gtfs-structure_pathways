@@ -642,3 +642,14 @@ fn read_levels() {
         .expect("level_platform should exist");
     assert_eq!(platform.level_index, -1.0);
 }
+
+#[test]
+fn supply_pathways() {
+    let gtfs = Gtfs::from_path("fixtures/with_levels").expect("impossible to read gtfs");
+    let pathways = gtfs.pathways;
+
+    assert_eq!(pathways.len(), 17);
+    assert_eq!(pathways.get("pw_broken_mode").unwrap().id,"pw_broken_mode");
+
+}
+
